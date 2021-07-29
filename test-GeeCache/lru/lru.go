@@ -20,8 +20,8 @@ type Cache struct {
 	size     int64
 }
 
-// newCache 为了方便实例化 LRUCache
-func newCache(capacity int64) *Cache {
+// NewCache 为了方便实例化 LRUCache
+func NewCache(capacity int64) *Cache {
 	cache := Cache{
 		capacity: capacity,
 		head:     &DListNode{},
@@ -43,7 +43,7 @@ func newNode(key int, value int, next *DListNode, prev *DListNode) *DListNode {
 	}
 }
 
-func (c *Cache) get(key int) int {
+func (c *Cache) Get(key int) int {
 	if node, ok := c.cache[key]; ok {
 		c.makeRecently(node)
 		return node.value
@@ -52,7 +52,7 @@ func (c *Cache) get(key int) int {
 	}
 }
 
-func (c *Cache) put(key int, value int) {
+func (c *Cache) Put(key int, value int) {
 	if node, ok := c.cache[key]; ok {
 		node.value = value
 		c.makeRecently(node)
