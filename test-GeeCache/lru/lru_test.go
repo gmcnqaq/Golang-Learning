@@ -5,7 +5,7 @@ import (
 )
 
 func TestCache(t *testing.T) {
-	LRUCache := NewCache(2)
+	LRUCache := NewCache(6)
 	LRUCache.Put(1, 1)
 	LRUCache.Put(2, 2)
 	res1 := LRUCache.Get(1)
