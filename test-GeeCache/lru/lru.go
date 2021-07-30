@@ -1,5 +1,9 @@
 package lru
 
+import (
+	"fmt"
+)
+
 type DListNode struct {
 	key   string
 	value Value
@@ -58,25 +62,29 @@ func (c *Cache) Get(key string) Value {
 func (c *Cache) Put(key string, value Value) {
 	// 先判断是否有足够的空间
 	putSize := int64(len(key)) + int64(value.Len())
-	for c.size+putSize > c.capacity {
-		// 删除最近最少使用的节点，并从哈希标中移除对应的项
-		leastRecently := c.removeLeastRecently()
-		delete(c.cache, leastRecently.key)
-		// 释放相应的空间
-		c.size -= int64(len(leastRecently.key)) + int64(leastRecently.value.Len())
-	}
-	// 判断该值是否在缓存中
-	if node, exist := c.cache[key]; exist {
-		node.value = value
-		c.makeRecently(node)
-		// 消耗对应的空间
-		c.size += int64(value.Len()) - int64(node.value.Len())
+	if c.capacity > 0 && c.capacity >= putSize {
+		for c.size+putSize > c.capacity {
+			// 删除最近最少使用的节点，并从哈希标中移除对应的项
+			leastRecently := c.removeLeastRecently()
+			delete(c.cache, leastRecently.key)
+			// 释放相应的空间
+			c.size -= int64(len(leastRecently.key)) + int64(leastRecently.value.Len())
+		}
+		// 判断该值是否在缓存中
+		if node, exist := c.cache[key]; exist {
+			node.value = value
+			c.makeRecently(node)
+			// 消耗对应的空间
+			c.size += int64(value.Len()) - int64(node.value.Len())
+		} else {
+			// 添加新的节点
+			node = newNode(key, value, nil, nil)
+			c.addRecently(node)
+			c.cache[key] = node
+			c.size += putSize
+		}
 	} else {
-		// 添加新的节点
-		node = newNode(key, value, nil, nil)
-		c.addRecently(node)
-		c.cache[key] = node
-		c.size += putSize
+		fmt.Println("error: no enough space")
 	}
 }
 
