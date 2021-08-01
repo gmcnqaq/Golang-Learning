@@ -18,27 +18,37 @@ type HTTPPool struct {
 	basePath string
 }
 
+func NewHTTPPool(self string) *HTTPPool {
+	return &HTTPPool{
+		self:     self,
+		basePath: defaultBasePath,
+	}
+}
+
+// Log 带有服务器名称的信息
 func (p *HTTPPool) Log(format string, v ...interface{}) {
 	log.Printf("[Server %s] %s", p.self, fmt.Sprintf(format, v...))
 }
 
+// ServeHTTP 处理所有的 HTTP 请求
 func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// 只处理 basePath 开头的请求
 	if !strings.HasPrefix(r.URL.Path, p.basePath) {
 		panic("HTTPPool serving unexpected path: " + r.URL.Path)
 	}
 	p.Log("%s %s", r.Method, r.URL.Path)
-	// /<basePath>/<groupname>/<key> required
+	// /<basePath>/<groupName>/<key> required
 	parts := strings.SplitN(r.URL.Path[len(p.basePath):], "/", 2)
 	if len(parts) != 2 {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
-	groupNmae := parts[0]
+	groupName := parts[0]
 	key := parts[1]
 
-	group := GetGroup(groupNmae)
+	group := GetGroup(groupName)
 	if group == nil {
-		http.Error(w, "no such group"+groupNmae, http.StatusNotFound)
+		http.Error(w, "no such group"+groupName, http.StatusNotFound)
 		return
 	}
 

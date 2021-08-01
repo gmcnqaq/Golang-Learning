@@ -30,15 +30,14 @@ func TestGroup_Get(t *testing.T) {
 
 	for k, v := range db {
 		if view, err := gee.Get(k); err != nil || view.String() != v {
-			t.Fatal("failed to get value of Tom")
-		}
+			t.Fatal("failed to get value")
+		} // 回调函数获取数据
 		if _, err := gee.Get(k); err != nil || loadCounts[k] > 1 {
 			t.Fatalf("cache %s miss", k)
-		}
-
-		if view, err := gee.Get("unknown"); err != nil {
-			t.Fatalf("the value of unknown should be empty, but %s got", view)
-		}
+		} // 缓存命中
+	}
+	if view, err := gee.Get("unknown"); err == nil {
+		t.Fatalf("the value of unknown should be empty, but %s got", view)
 	}
 }
 

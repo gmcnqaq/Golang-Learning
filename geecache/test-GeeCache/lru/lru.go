@@ -62,7 +62,7 @@ func (c *Cache) Get(key string) Value {
 func (c *Cache) Put(key string, value Value) {
 	// 先判断是否有足够的空间
 	putSize := int64(len(key)) + int64(value.Len())
-	if c.capacity > 0 && c.capacity >= putSize {
+	if c.capacity >= putSize {
 		for c.size+putSize > c.capacity {
 			// 删除最近最少使用的节点，并从哈希标中移除对应的项
 			leastRecently := c.removeLeastRecently()
