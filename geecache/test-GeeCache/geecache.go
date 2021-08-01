@@ -16,21 +16,22 @@ import (
                                ｜----> 「回调函数」，获取值，并添加到缓存 --> 返回缓存值(3)
 */
 
-// Getter 回调函数，如果缓存不存在，得到源数据。
-// Todo: 回调函数 Getter
+// Getter 回调函数，如果缓存不存在，从数据源获取数据
 type Getter interface {
 	Get(key string) ([]byte, error)
 }
 
+// GetterFunc 定义函数类型，并实现 Getter 接口的 Get 方法
+// 函数类型实现某一个接口，称之为接口型函数，方便使用者在调用时既能够传入函数作为参数，也能够传入实现了该接口的结构体作为参数
 type GetterFunc func(key string) ([]byte, error)
 
 func (f GetterFunc) Get(key string) ([]byte, error) {
 	return f(key)
 }
 
-// Group 一个 Group 可以认为是一个缓存的命名空间，每个 Group 拥有一个唯一的名称 name。
+// Group 一个 Group 可以认为是一个缓存的命名空间，每个 Group 拥有一个唯一的名称 name。比如缓存学生的成绩命名为 scores，学生名字命名为 names
 // 第二个属性 getter Getter，即缓存未命中时获取源数据的回调
-// 第三个属性 mainCache，即实现的并发缓存
+// 第三个属性 mainCache，即前面实现的并发缓存
 type Group struct {
 	name      string
 	getter    Getter
@@ -43,7 +44,6 @@ var (
 )
 
 // NewGroup 用来实例化 Group，并将 group 存储在全局变量 groups 中
-// Todo：单例 group
 func NewGroup(name string, cacheBytes int64, getter Getter) *Group {
 	if getter == nil {
 		panic("nil Getter")
@@ -59,7 +59,7 @@ func NewGroup(name string, cacheBytes int64, getter Getter) *Group {
 	return g
 }
 
-// GetGroup 用来特定名称的 Group
+// GetGroup 用来得到特定名称的 Group
 func GetGroup(name string) *Group {
 	mu.RLock()
 	g := groups[name]
@@ -71,10 +71,12 @@ func (g *Group) Get(key string) (ByteView, error) {
 	if key == "" {
 		return *NewByteView(nil), fmt.Errorf("key is required")
 	}
+	// 如果缓存中存在
 	if v, exist := g.mainCache.get(key); exist {
 		log.Println("[GeeCache] hit")
 		return v, nil
 	}
+	// 否则回调
 	return g.load(key)
 }
 
