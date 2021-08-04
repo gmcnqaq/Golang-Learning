@@ -18,6 +18,7 @@ type Map struct {
 	hashMap  map[int]string
 }
 
+// NewMap 允许自定义虚拟节点倍数和 Hash 函数，默认为 crc32.ChecksumIEEE 算法
 func NewMap(replicas int, fn Hash) *Map {
 	m := &Map{
 		replicas: replicas,
@@ -42,12 +43,12 @@ func (m *Map) Add(keys ...string) {
 			m.hashMap[hash] = key
 		}
 	}
-	sort.Ints(m.keys)
+	sort.Ints(m.keys) // 环上的哈希值排序
 }
 
 // Get 选择节点
 // 根据 key 的哈希值，顺时针找到第一个匹配的虚拟节点的下标 idx，从 m.keys 中获取到对应的哈希值
-// 如果 idx == len(m.keys)，则应该选择 m.keys[0]，因为 m.keys 是一个环状结构，所以用取玉树的方式来处理这种情况
+// 如果 idx == len(m.keys)，则应该选择 m.keys[0]，因为 m.keys 是一个环状结构，所以用取余的方式来处理这种情况
 func (m *Map) Get(key string) string {
 	if len(m.keys) == 0 {
 		return ""
