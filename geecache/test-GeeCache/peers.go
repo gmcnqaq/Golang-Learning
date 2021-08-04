@@ -1,5 +1,7 @@
 package test_GeeCache
 
+import pb "Golang/Learning/geecache/test-GeeCache/geecachepb"
+
 // 之前实现了 geeCache 的取得缓存值的流程 1 和流程 3，此处实现流程 2
 /*
 使用一致性哈希选择节点          是                                    是
@@ -13,7 +15,7 @@ type PeerPicker interface {
 	PickPeer(key string) (peer PeerGetter, ok bool)
 }
 
-// PeerGetter 的 Get 方法用于从对应 group 查找缓存值
+// PeerGetter 的 Get() 方法用于从对应 group 查找缓存值。PeerGetter 对应上述流程中的 HTTP 客户端
 type PeerGetter interface {
-	Get(group string, key string) ([]byte, error)
+	Get(in *pb.Request, out *pb.Response) error
 }

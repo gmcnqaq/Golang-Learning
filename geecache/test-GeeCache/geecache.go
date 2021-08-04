@@ -1,6 +1,7 @@
 package test_GeeCache
 
 import (
+	pb "Golang/Learning/geecache/test-GeeCache/geecachepb"
 	"Golang/Learning/geecache/test-GeeCache/singleflight"
 	"fmt"
 	"log"
@@ -84,9 +85,7 @@ func (g *Group) Get(key string) (ByteView, error) {
 	return g.load(key)
 }
 
-/*func (g *Group) load(key string) (ByteView, error) {
-	return g.GetLocally(key)
-}*/
+
 func (g *Group) load(key string) (ByteView, error) {
 	viewi, err := g.loader.Do(key, func() (interface{}, error) {
 		if g.peers != nil {
@@ -120,6 +119,7 @@ func (g *Group) populateCache(key string, value ByteView) {
 	g.mainCache.put(key, value)
 }
 
+// RegisterPeers 将实现了 PeerPicker 接口的 HTTPPool 注入到 Group 中
 func (g *Group) RegisterPeers(peers PeerPicker)  {
 	if g.peers != nil {
 		panic("RegisterPeerPicker called more than once")
@@ -127,10 +127,16 @@ func (g *Group) RegisterPeers(peers PeerPicker)  {
 	g.peers = peers
 }
 
+// 使用实现了 PeerGetter 接口的 httpGetter 从访问远程节点，获取缓存值
 func (g *Group) getFromPeer(peer PeerGetter, key string) (ByteView, error) {
-	bytes, err := peer.Get(g.name, key)
+	req := &pb.Request{
+		Group: g.name,
+		Key: key,
+	}
+	res := &pb.Response{}
+	err := peer.Get(req, res)
 	if err != nil {
 		return *NewByteView(nil), err
 	}
-	return ByteView{b: bytes}, nil
+	return ByteView{b: res.Value}, nil
 }
