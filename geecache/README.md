@@ -21,19 +21,19 @@ geecache
 ├── byteview.go              // 缓存值的抽象与封装
 ├── cache.go                 // 并发控制
 ├── consistehash
-│   ├── consistehash.go     // 一致性哈希算法
+│   ├── consistehash.go      // 一致性哈希算法
 │   └── consistenthash_test.go
-├── geecache.go             // 负责与外部交互，控制缓存存储和获取的主流程
+├── geecache.go              // 负责与外部交互，控制缓存存储和获取的主流程
 ├── geecache_test.go
 ├── geecachepb
 │   ├── geecachepb.pb.go
-│   └── geecachepb.proto    // protobuf 的使用
-├── http.go                 // 提供被其他节点访问的能力（基于 http）
+│   └── geecachepb.proto     // 使用 protobuf 进行通信
+├── http.go                  // 提供被其他节点访问的能力（基于 http）
 ├── lru
-│   ├── lru.go             // lru 缓存淘汰策略
+│   ├── lru.go               // lru 缓存淘汰策略
 │   └── lru_test.go
-├── peers.go               // 节点选择的抽象
+├── peers.go                 // 节点选择的抽象
 └── singleflight
-    └── singleflight.go    // 防止缓存击穿
+    └── singleflight.go      // 防止缓存击穿
 
 ```
