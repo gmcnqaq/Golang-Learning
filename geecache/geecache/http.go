@@ -1,10 +1,10 @@
-package test_GeeCache
+package geecache
 
 import (
-	"Golang/Learning/geecache/test-GeeCache/consistehash"
-	pb "Golang/Learning/geecache/test-GeeCache/geecachepb"
-	"github.com/golang/protobuf/proto"
+	"Golang-Learning/geecache/geecache/consistenthash"
+	pb "Golang-Learning/geecache/geecache/geecachepb"
 	"fmt"
+	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,7 +18,6 @@ const (
 	defaultReplicas = 50
 )
 
-
 // 首先创建一个结构体 HTTPPool，作为承载节点间 HTTP 通信的核心数据结构
 
 // HTTPPool 第一个参数 self，用来记录自己的地址，包括主机名/IP 和端口
@@ -26,10 +25,10 @@ const (
 // peers 一致性哈希算法的 Map，用来根据具体的 key 选择节点
 // httpGetters 映射远程节点与对应的 httpGetter。每一个远程节点对应一个 httpGetter，因为 httpGetter 与远程节点的地址 baseURL 有关
 type HTTPPool struct {
-	self     string
-	basePath string
-	mu sync.Mutex
-	peers *consistehash.Map
+	self        string
+	basePath    string
+	mu          sync.Mutex
+	peers       *consistenthash.Map
 	httpGetters map[string]*httpGetter
 }
 
@@ -85,10 +84,10 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Set 实例化一致性哈希算法，添加传入的节点
 // 为每一个节点创建一个 httpGetter 客户端
-func (p *HTTPPool) Set(peers ...string)  {
+func (p *HTTPPool) Set(peers ...string) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	p.peers = consistehash.NewMap(defaultReplicas, nil)
+	p.peers = consistenthash.NewMap(defaultReplicas, nil)
 	p.peers.Add(peers...)
 	p.httpGetters = make(map[string]*httpGetter, len(peers))
 	for _, peer := range peers {

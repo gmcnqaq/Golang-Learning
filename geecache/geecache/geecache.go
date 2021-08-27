@@ -1,8 +1,8 @@
-package test_GeeCache
+package geecache
 
 import (
-	pb "Golang/Learning/geecache/test-GeeCache/geecachepb"
-	"Golang/Learning/geecache/test-GeeCache/singleflight"
+	pb "Golang-Learning/geecache/geecache/geecachepb"
+	"Golang-Learning/geecache/geecache/singleflight"
 	"fmt"
 	"log"
 	"sync"
@@ -38,8 +38,8 @@ type Group struct {
 	name      string
 	getter    Getter
 	mainCache cache
-	peers PeerPicker
-	loader *singleflight.Group
+	peers     PeerPicker
+	loader    *singleflight.Group
 }
 
 var (
@@ -58,7 +58,7 @@ func NewGroup(name string, cacheBytes int64, getter Getter) *Group {
 		name:      name,
 		getter:    getter,
 		mainCache: cache{cacheBytes: cacheBytes},
-		loader: &singleflight.Group{},
+		loader:    &singleflight.Group{},
 	}
 	groups[name] = g
 	return g
@@ -84,7 +84,6 @@ func (g *Group) Get(key string) (ByteView, error) {
 	// 否则回调
 	return g.load(key)
 }
-
 
 func (g *Group) load(key string) (ByteView, error) {
 	viewi, err := g.loader.Do(key, func() (interface{}, error) {
@@ -120,7 +119,7 @@ func (g *Group) populateCache(key string, value ByteView) {
 }
 
 // RegisterPeers 将实现了 PeerPicker 接口的 HTTPPool 注入到 Group 中
-func (g *Group) RegisterPeers(peers PeerPicker)  {
+func (g *Group) RegisterPeers(peers PeerPicker) {
 	if g.peers != nil {
 		panic("RegisterPeerPicker called more than once")
 	}
@@ -131,7 +130,7 @@ func (g *Group) RegisterPeers(peers PeerPicker)  {
 func (g *Group) getFromPeer(peer PeerGetter, key string) (ByteView, error) {
 	req := &pb.Request{
 		Group: g.name,
-		Key: key,
+		Key:   key,
 	}
 	res := &pb.Response{}
 	err := peer.Get(req, res)

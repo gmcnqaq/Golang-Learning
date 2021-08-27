@@ -40,6 +40,5 @@ func TestCache(t *testing.T) {
 	case res4 != nil:
 		fmt.Println(res4)
 		t.Error("cache miss k3 failed")
-
 	}
 }

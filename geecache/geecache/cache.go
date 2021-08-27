@@ -1,7 +1,7 @@
-package test_GeeCache
+package geecache
 
 import (
-	"Golang/Learning/geecache/test-GeeCache/lru"
+	"Golang-Learning/geecache/geecache/lru"
 	"sync"
 )
 

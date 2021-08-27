@@ -1,4 +1,4 @@
-package test_GeeCache
+package geecache
 
 // 抽象出一个只读的数据结构 ByteView 用来表示缓存值
 // ByteView 只有一个数据成员，b []byte，b 将会存储真实的缓存值。选择 byte 类型是为了能够支持任意的数据类型的存储，例如字符串、图片等

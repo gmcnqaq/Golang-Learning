@@ -1,6 +1,6 @@
-package test_GeeCache
+package geecache
 
-import pb "Golang/Learning/geecache/test-GeeCache/geecachepb"
+import pb "Golang-Learning/geecache/geecache/geecachepb"
 
 // 之前实现了 geeCache 的取得缓存值的流程 1 和流程 3，此处实现流程 2
 /*
