@@ -1,7 +1,7 @@
 package main
 
 import (
-	testGeeCache "Golang/Learning/geecache/test-GeeCache"
+	"Golang-Learning/geecache/geecache"
 	"flag"
 	"fmt"
 	"log"
@@ -14,8 +14,8 @@ var db = map[string]string{
 	"Sam":  "567",
 }
 
-func createGroup() *testGeeCache.Group {
-	return testGeeCache.NewGroup("scores", 2<<10, testGeeCache.GetterFunc(
+func createGroup() *geecache.Group {
+	return geecache.NewGroup("scores", 2<<10, geecache.GetterFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[SlowDB] search key", key)
 			if v, ok := db[key]; ok {
@@ -25,15 +25,15 @@ func createGroup() *testGeeCache.Group {
 		}))
 }
 
-func startCacheServer(addr string, addrs []string, gee *testGeeCache.Group) {
-	peers := testGeeCache.NewHTTPPool(addr)
+func startCacheServer(addr string, addrs []string, gee *geecache.Group) {
+	peers := geecache.NewHTTPPool(addr)
 	peers.Set(addrs...)
 	gee.RegisterPeers(peers)
 	log.Println("geeCache is running ar", addr)
 	log.Fatal(http.ListenAndServe(addr[7:], peers))
 }
 
-func startAPIServer(apiAddr string, gee *testGeeCache.Group) {
+func startAPIServer(apiAddr string, gee *geecache.Group) {
 	http.Handle("/api", http.HandlerFunc(
 		func(writer http.ResponseWriter, request *http.Request) {
 			key := request.URL.Query().Get("key")
